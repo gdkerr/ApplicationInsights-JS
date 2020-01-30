@@ -349,7 +349,7 @@ export class AjaxMonitor extends BaseTelemetryPlugin implements IDependenciesPlu
     private instrumentOpen() {
         const originalOpen = XMLHttpRequest.prototype.open;
         const ajaxMonitorInstance = this;
-        XMLHttpRequest.prototype.open = function (method:string, url:string, async?:boolean) {
+        XMLHttpRequest.prototype.open = function (method: string, url: string, async?: boolean) {
             let funcThis = this;
             try {
                 if (ajaxMonitorInstance.isMonitoredInstance(funcThis, true) &&
