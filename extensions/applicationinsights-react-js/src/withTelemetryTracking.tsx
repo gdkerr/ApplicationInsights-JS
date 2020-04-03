@@ -5,7 +5,7 @@ import { IMetricTelemetry } from '@microsoft/applicationinsights-common';
 import * as React from 'react';
 import ReactPlugin from './ReactPlugin';
 
-/**
+/**x
  * Higher-order component function to hook Application Insights tracking 
  * in a React component's lifecycle.
  * 
@@ -36,9 +36,17 @@ export default function withTelemetryTracking<P>(reactPlugin: ReactPlugin, Compo
     private _intervalId?: any;
 
     // OUR VARIABLES
+    // QUESTION : For pagination and page loading is this a timed value or a count of number of times the page is laoded/paginated
     private _buttonClickCount: number = 0;
-    private _errorCount: number = 0;
-    private _paginationCount: number = 0;
+    private _errorCount: number = 0; // very important
+    private _pagination: number = 0; // Is there a lot of pagination happening or should there be searching
+    private _pageLoading: number = 0; // HOW OFTEN AND HOW LONG Is there a page that loads really slow
+    // Is there a component that when activated takes a super long time
+
+    // Maybe resizing
+
+    // Finding out useful information about how user uses application
+    // They use Redux - seeing when the state changes based on state
 
     //Runs when the components mounts. Initializes data
     public componentDidMount() {
@@ -48,6 +56,11 @@ export default function withTelemetryTracking<P>(reactPlugin: ReactPlugin, Compo
       this._lastActiveTimestamp = 0;
       this._idleStartTimestamp = 0;
       this._idleCount = 0;
+
+      this._buttonClickCount = 0;
+      this._errorCount = 0;
+      this._pagination = 0;
+      this._pageLoading = 0;
 
       this._intervalId = setInterval(() => {
         if (this._lastActiveTimestamp > 0 && this._idleStartTimestamp === 0 && Date.now() - this._lastActiveTimestamp >= this._idleTimeout) {
@@ -95,6 +108,8 @@ export default function withTelemetryTracking<P>(reactPlugin: ReactPlugin, Compo
            * another when pagination occurs etc.
            *  
            * */ 
+          // Question - is it understood that this component may be wrapped around a specific 
+          // thing like a button or will it be a group of things that we need to gather component data from each
           onKeyDown={this.trackActivity}
           onMouseMove={this.trackActivity}
           onScroll={this.trackActivity}
