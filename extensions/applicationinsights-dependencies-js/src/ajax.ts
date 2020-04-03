@@ -310,8 +310,8 @@ export class AjaxMonitor extends BaseTelemetryPlugin implements IDependenciesPlu
                                 ajaxData.requestHeaders[RequestHeaders.traceParentHeader] = traceparent.toString();
                             }
                         }
-                        return init;
                     }
+
                     return init;
                 } else if (xhr) { // XHR
                     if (CorrelationIdHelper.canIncludeCorrelationHeader(_config, ajaxData.getAbsoluteUrl(), currentWindowHost)) {
@@ -340,6 +340,7 @@ export class AjaxMonitor extends BaseTelemetryPlugin implements IDependenciesPlu
         
                     return xhr;
                 }
+
                 return undefined;
             }
        
@@ -393,7 +394,10 @@ export class AjaxMonitor extends BaseTelemetryPlugin implements IDependenciesPlu
                                     !(isPolyfill && _xhrInitialized)) {
                                 let ctx = callDetails.ctx();
                                 fetchData = _createFetchRecord(input, init);
-                                init = _self.includeCorrelationHeaders(fetchData, input, init);
+                                let newInit = _self.includeCorrelationHeaders(fetchData, input, init);
+                                if (newInit !== init) {
+                                    callDetails.set(1, newInit);
+                                }
                                 ctx.data = fetchData;
                             }
                         },
