@@ -75,21 +75,14 @@ export default function withTelemetryTracking<P>(reactPlugin: ReactPlugin, Compo
       if (this._mountTimestamp === 0) {
         throw new Error('withTelemetryTracking:componentWillUnmount: mountTimestamp is not initialized.');
       }
-      if (this._intervalId) {
-        clearInterval(this._intervalId);
-      }
-
-      if (this._firstActiveTimestamp === 0) {
+      // There main data value that they are tracking
+      if (this._buttonClickCount === 0) {
         return;
       }
-
-      // There main data value that they are tracking
-      const engagementTime = this.getEngagementTimeSeconds();
-      // TODO we will need to configure this to have metric data that we need
       const metricData: IMetricTelemetry = {
-        average: engagementTime,
+        average: this._buttonClickCount,
         // We don't just want engagementTime, we want # of buttons clicked etc
-        name: 'React Component Engaged Time (seconds)',
+        name: 'React Component Times Clicked',
         sampleCount: 1
       };
 
@@ -110,12 +103,7 @@ export default function withTelemetryTracking<P>(reactPlugin: ReactPlugin, Compo
            * */ 
           // Question - is it understood that this component may be wrapped around a specific 
           // thing like a button or will it be a group of things that we need to gather component data from each
-          onKeyDown={this.trackActivity}
-          onMouseMove={this.trackActivity}
-          onScroll={this.trackActivity}
-          onMouseDown={this.trackActivity}
-          onTouchStart={this.trackActivity}
-          onTouchMove={this.trackActivity}
+          onClick={this.trackButtonClick}
           className={className}
         >
           <Component {...this.props} />
@@ -139,8 +127,9 @@ export default function withTelemetryTracking<P>(reactPlugin: ReactPlugin, Compo
       }
     }
 
-    private getEngagementTimeSeconds(): number {
-      return (Date.now() - this._firstActiveTimestamp - this._totalIdleTime - this._idleCount * this._idleTimeout) / 1000;
+    private trackButtonClick = (e: React.SyntheticEvent<any>): void => {
+      //increment the number of button clicks
+      this._buttonClickCount += 1;
     }
   }
 }
